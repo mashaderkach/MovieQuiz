@@ -5,26 +5,34 @@ final class MovieQuizViewController: UIViewController {
     // MARK: - Model (struct)
 
     // описываем один вопрос викторины
-    struct QuizQuestion {
+    private struct QuizQuestion {
         let image: String // строка с названием фильма (совпадает с названием картинки-афиши фильма из Assets)
         let text: String // строка с воспросом о рейтинге фильма
         let correctAnswer: Bool // правильный ответ на вопрос
     }
     
     // отображение на экране
-    struct QuizStepViewModel {
+    private struct QuizStepViewModel {
         let image: UIImage // сама картинка с афишей фильма
         let question: String // вопрос о рейтинге квиза
         let questionNumber: String // номер вопроса ("1/10")
     }
     
     // показ алерта-результата в конце квиза
-    struct QuizResultsViewModel {
+    private struct QuizResultsViewModel {
         let title: String
         let text: String
         let buttonText: String
     }
     
+    // обертка для кастомных шрифтов
+    private struct Fonts {
+        static let ysDisplayBoldFontName = "YSDisplay-Bold"
+        static let ysDisplayBold23 = UIFont(name: ysDisplayBoldFontName, size: 23)
+        
+        static let ysDisplayMediumFontName = "YSDisplay-Medium"
+        static let ysDisplayMedium20 = UIFont(name: ysDisplayMediumFontName, size: 20)
+    }
     
     // MARK: - Properties
  
@@ -62,16 +70,14 @@ final class MovieQuizViewController: UIViewController {
 
     @IBAction private func noButtonClicked(_ sender: UIButton) {
         let currentQuestion = questions[currentQuestionIndex]
-        let givenAnswer = false
         // cравниваем ответ пользователя с правильным и показываем результат
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        showAnswerResult(isCorrect: !currentQuestion.correctAnswer)
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         let currentQuestion = questions[currentQuestionIndex]
-        let givenAnswer = true
         // cравниваем ответ пользователя с правильным и показываем результат
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        showAnswerResult(isCorrect: currentQuestion.correctAnswer)
     }
     
     
@@ -84,10 +90,10 @@ final class MovieQuizViewController: UIViewController {
         let viewModel = convert(model: currentQuestion)
         show(quiz: viewModel)
  
-        textLabel.font = UIFont(name: "YSDisplay-Bold", size: 23)
-        counterLabel.font = UIFont(name: "YSDisplay-Medium", size: 20)
-        yesButton.titleLabel?.font = UIFont(name: "YSDisplay-Medium", size: 20)
-        noButton.titleLabel?.font = UIFont(name: "YSDisplay-Medium", size: 20)
+        textLabel.font = Fonts.ysDisplayBold23
+        counterLabel.font = Fonts.ysDisplayMedium20
+        yesButton.titleLabel?.font = Fonts.ysDisplayMedium20
+        noButton.titleLabel?.font = Fonts.ysDisplayMedium20
     }
     
     // преобразуем данные из модели QuizQuestion в формат QuizStepViewModel
@@ -112,7 +118,7 @@ final class MovieQuizViewController: UIViewController {
     // показываем рамку вокруг картинки с цветом результата, а потом переходим к следующему вопросу
     private func showAnswerResult(isCorrect: Bool) {
         
-        if isCorrect == true {
+        if isCorrect {
             correctAnswers += 1
         }
         
