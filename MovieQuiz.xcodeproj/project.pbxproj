@@ -88,6 +88,7 @@
 				42046CAC2EC8D3360034790B /* QuestionFactoryProtocol.swift */,
 				42311E382EC9CBB1007BDFAB /* QuestionFactoryDelegate.swift */,
 				4232A55B2ECC68CF00320702 /* StatisticServiceProtocol.swift */,
+				4232A55F2ECC92EB00320702 /* StatisticService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -98,7 +99,6 @@
 				AD1ABAB52831907B00B3E448 /* MovieQuizViewController.swift */,
 				AD1ABAB72831907B00B3E448 /* Main.storyboard */,
 				42311E412EC9E404007BDFAB /* AlertPresenter.swift */,
-				4232A55F2ECC92EB00320702 /* StatisticService.swift */,
 			);
 			path = Presentation;
 			sourceTree = "<group>";

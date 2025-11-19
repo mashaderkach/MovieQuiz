@@ -1,7 +1,7 @@
 import UIKit
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
- 
+    
     // MARK: - Model (struct)
     
     // обертка для кастомных шрифтов
@@ -20,12 +20,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // счетчик правильных ответов (начальное значение 0)
     private var correctAnswers = 0
-
     
     // общее количество вопросов для квиза
     private let questionsAmount: Int = 10
+    
     // фабрика вопросов. Контроллер будет обращаться за вопросами к ней
     private var questionFactory: QuestionFactoryProtocol = QuestionFactory()
+    
     // вопрос, который видит пользователь
     private var currentQuestion: QuizQuestion?
     
@@ -41,12 +42,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var noButton: UIButton!
     @IBOutlet private var yesButton: UIButton!
     
-    
-    
     // MARK: - Actions
-
+    
     @IBAction private func noButtonClicked(_ sender: UIButton) {
-//        let currentQuestion = questions[currentQuestionIndex]
+        //        let currentQuestion = questions[currentQuestionIndex]
         guard let currentQuestion = currentQuestion else {
             return
         }
@@ -55,7 +54,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
-//        let currentQuestion = questions[currentQuestionIndex]
         guard let currentQuestion = currentQuestion else {
             return
         }
@@ -63,17 +61,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         showAnswerResult(isCorrect: currentQuestion.correctAnswer)
     }
     
-    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         let questionFactory = QuestionFactory()
         questionFactory.setup(delegate: self)
         self.questionFactory = questionFactory
         
         questionFactory.requestNextQuestion()
- 
+        
         textLabel.font = Fonts.ysDisplayBold23
         counterLabel.font = Fonts.ysDisplayMedium20
         yesButton.titleLabel?.font = Fonts.ysDisplayMedium20
@@ -93,9 +90,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         return questionStep
     }
     
-    
     // MARK: - Update Methods
-   
+    
     // показываем на экран вопрос, который принимает на вход вью модель вопроса и ничего не возвращает
     private func show(quiz step: QuizStepViewModel) {
         counterLabel.text = step.questionNumber
@@ -120,8 +116,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         // запускаем задачу через 1 секунду c помощью диспетчера задач
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-           // код, который мы хотим вызвать через 1 секунду
-            guard let self = self else { return }
+            // код, который мы хотим вызвать через 1 секунду
+            guard let self else { return }
             self.showNextQuestionOrResults()
         }
     }
@@ -130,7 +126,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // определяем, показывать следующий вопрос или уже результат квиза
     private func showNextQuestionOrResults() {
-
+        
         if currentQuestionIndex == questionsAmount - 1 {
             
             statisticService.store(correct: correctAnswers, total: questionsAmount)
@@ -151,9 +147,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
-    
     // MARK: - Alert
-    
     
     // отображаем алерт с результатами квища
     private func show(quiz result: QuizResultsViewModel) {
@@ -161,43 +155,39 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         let gamePlayed = statisticService.gameCount
         let bestGame = statisticService.bestGame
         let accuracy = String(format: "%.2f", statisticService.totalAccuracy)
-
         
-        
-        let message = 
-        """
+        let message = """
             Ваш результат: \(correctAnswers)/\(questionsAmount)
             Количество сыгранных квизов: \(gamePlayed)
             Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))
             Средняя точность: \(accuracy)%
             """
-            
+        
         let model = AlertModel(title: result.title, message: message, buttonText: result.buttonText) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             
-            self.currentQuestionIndex = 0
-            self.correctAnswers = 0
-            self.questionFactory.requestNextQuestion()
+            currentQuestionIndex = 0
+            correctAnswers = 0
+            questionFactory.requestNextQuestion()
         }
         
         alertPresenter.show(in: self, model: model)
     }
     
-    
     // MARK: - QuestionFactoryDelegate
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question = question else {
-                return
-            }
-
+            return
+        }
+        
         currentQuestion = question
         let viewModel = convert(model: question)
         
         DispatchQueue.main.async { [weak self] in
-                self?.show(quiz: viewModel)
-            }
+            self?.show(quiz: viewModel)
+        }
     }
-
+    
 }
 
 
@@ -264,4 +254,4 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
  Настоящий рейтинг: 5,8
  Вопрос: Рейтинг этого фильма больше чем 6?
  Ответ: НЕТ
-*/
+ */
