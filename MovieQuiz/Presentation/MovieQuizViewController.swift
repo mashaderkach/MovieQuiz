@@ -25,11 +25,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private let questionsAmount: Int = 10
     
     // фабрика вопросов. Контроллер будет обращаться за вопросами к ней
-    private var questionFactory: QuestionFactoryProtocol = QuestionFactory()
+    private var questionFactory: QuestionFactoryProtocol?
     
     // вопрос, который видит пользователь
     private var currentQuestion: QuizQuestion?
     
+    // объект для отображения алерта пользователю
     private var alertPresenter = AlertPresenter()
     
     private var statisticService: StatisticServiceProtocol!
@@ -41,14 +42,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var counterLabel: UILabel!
     @IBOutlet private var noButton: UIButton!
     @IBOutlet private var yesButton: UIButton!
+    @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
     // MARK: - Actions
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
-        //        let currentQuestion = questions[currentQuestionIndex]
         guard let currentQuestion = currentQuestion else {
             return
         }
+        
         // cравниваем ответ пользователя с правильным и показываем результат
         showAnswerResult(isCorrect: !currentQuestion.correctAnswer)
     }
@@ -65,11 +67,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let questionFactory = QuestionFactory()
-        questionFactory.setup(delegate: self)
+        let questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         self.questionFactory = questionFactory
         
-        questionFactory.requestNextQuestion()
+//        questionFactory.requestNextQuestion()
+        
+        showLoadingIndicator()
+        questionFactory.loadData()
         
         textLabel.font = Fonts.ysDisplayBold23
         counterLabel.font = Fonts.ysDisplayMedium20
@@ -83,11 +87,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // преобразуем данные из модели QuizQuestion в формат QuizStepViewModel
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        let questionStep = QuizStepViewModel(
-            image: UIImage(named: model.image) ?? UIImage(),
+        return QuizStepViewModel(
+            image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
-        return questionStep
+//        return questionStep
     }
     
     // MARK: - Update Methods
@@ -122,6 +126,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
+
     // MARK: - Navigation
     
     // определяем, показывать следующий вопрос или уже результат квиза
@@ -143,13 +148,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             
             currentQuestionIndex += 1
             
-            questionFactory.requestNextQuestion()
+            questionFactory?.requestNextQuestion()
         }
     }
     
     // MARK: - Alert
     
-    // отображаем алерт с результатами квища
+    // отображаем алерт с результатами квиза
     private func show(quiz result: QuizResultsViewModel) {
         
         let gamePlayed = statisticService.gameCount
@@ -168,11 +173,29 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             
             currentQuestionIndex = 0
             correctAnswers = 0
-            questionFactory.requestNextQuestion()
+            questionFactory?.requestNextQuestion()
         }
         
         alertPresenter.show(in: self, model: model)
     }
+    
+    
+    private func showNetworkError(message: String) {
+//        hideLoadingIndicator()
+        
+        let model = AlertModel(
+            title: "Ошибка",
+            message: message,
+            buttonText: "Попробовать ещё раз") { [weak self] in
+                guard let self = self else { return }
+                
+                self.currentQuestionIndex = 0
+                self.correctAnswers = 0
+            }
+        alertPresenter.show(in: self, model: model)  
+    }
+    
+    
     
     // MARK: - QuestionFactoryDelegate
     func didReceiveNextQuestion(question: QuizQuestion?) {
@@ -186,6 +209,22 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }
+    }
+    
+    func didLoadDataFromServer() {
+        activityIndicator.isHidden = true
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription) // возьмём в качестве сообщения описание ошибки
+    }
+    
+    // MARK: - Indicator
+    
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
     }
     
 }

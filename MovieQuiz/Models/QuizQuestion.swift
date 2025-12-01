@@ -6,7 +6,7 @@
 import Foundation
 
  struct QuizQuestion {
-    let image: String // строка с названием фильма (совпадает с названием картинки-афиши фильма из Assets)
+    let image: Data 
     let text: String // строка с воспросом о рейтинге фильма
     let correctAnswer: Bool // правильный ответ на вопрос
 }

@@ -10,4 +10,8 @@ protocol QuestionFactoryDelegate: AnyObject {
     
     // метод, который должен быть у делегата фабрики - его будет вызывать фабрика, чтобы отдать готовый вопрос квиза
     func didReceiveNextQuestion(question: QuizQuestion?)
+    
+    func didLoadDataFromServer() // сообщение об успешной загрузке
+    
+    func didFailToLoadData(with error: Error) // сообщение об ошибке загрузки
 }
