@@ -29,6 +29,7 @@ final class StatisticService: StatisticServiceProtocol {
         }
     }
     
+    // лучший результат игры
     var bestGame: GameResult {
         get {
             let correct = storage.integer(forKey: Keys.bestGameCorrect.rawValue)
@@ -43,7 +44,7 @@ final class StatisticService: StatisticServiceProtocol {
         }
     }
     
-    
+    // общее количество правильных ответов
     private var totalCorrectAnswers: Int {
         get {
             storage.integer(forKey: Keys.totalCorrectAnswers.rawValue)
@@ -53,6 +54,7 @@ final class StatisticService: StatisticServiceProtocol {
         }
     }
     
+    // общее количество заданных вопросов
     private var totalQuestionsAmount: Int {
         get {
             storage.integer(forKey: Keys.totalQuestionsAsked.rawValue)
@@ -62,6 +64,7 @@ final class StatisticService: StatisticServiceProtocol {
         }
     }
     
+    // процент правильных ответов за все время
     var totalAccuracy: Double {
         let totalQuestion = totalQuestionsAmount
         if totalQuestion == 0 {

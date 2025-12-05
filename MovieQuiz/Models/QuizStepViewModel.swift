@@ -10,5 +10,5 @@ import UIKit
  struct QuizStepViewModel {
     let image: UIImage // сама картинка с афишей фильма
     let question: String // вопрос о рейтинге квиза
-    let questionNumber: String // номер вопроса ("1/10")
+    let questionNumber: String // номер текущего вопроса ("1/10")
 }
